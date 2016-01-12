@@ -796,17 +796,11 @@ var m = (function app(window, undefined) {
 		try {
 			//lastRedrawId is a positive number if a second redraw is requested before the next animation frame
 			//lastRedrawID is null if it's the first redraw and not an event handler
-			if (lastRedrawId && !force) {
-				//when setTimeout: only reschedule redraw if time between now and previous redraw is bigger than a frame, otherwise keep currently scheduled timeout
-				//when rAF: always reschedule redraw
-				if ($requestAnimationFrame === window.requestAnimationFrame || new Date - lastRedrawCallTime > FRAME_BUDGET) {
-					if (lastRedrawId > 0) $cancelAnimationFrame(lastRedrawId);
-					lastRedrawId = $requestAnimationFrame(redraw, FRAME_BUDGET);
-				}
-			}
-			else {
+			if (force) {
 				redraw();
-				lastRedrawId = $requestAnimationFrame(function() { lastRedrawId = null; }, FRAME_BUDGET);
+			}
+			else if (!lastRedrawId) {
+				lastRedrawId = $requestAnimationFrame(redraw, FRAME_BUDGET);
 			}
 		}
 		finally {
