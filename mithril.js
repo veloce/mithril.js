@@ -179,26 +179,14 @@
 	}
 	// This function was causing deopts in Chrome.
 	function dataToString(data) {
-		// data.toString() might throw or return null if data is the return
-		// value of Console.log in some versions of Firefox (behavior depends on
-		// version)
-		try {
-			if (data != null && data.toString() != null) return data
-		} catch (e) {
-			// silently ignore errors
-		}
+    if (data != null && data.toString() != null) return data
 		return ""
 	}
 
 	// This function was causing deopts in Chrome.
 	function injectTextNode(parentElement, first, index, data) {
-		try {
-			insertNode(parentElement, first, index)
-			first.nodeValue = data
-		} catch (e) {
-			// IE erroneously throws error when appending an empty text node
-			// after a null
-		}
+    insertNode(parentElement, first, index)
+    first.nodeValue = data
 	}
 
 	function flatten(list) {
@@ -1395,7 +1383,7 @@
 	}
 
 	var redrawing = false
-	m.redraw = function (force) {
+	m.redraw = function (force, forceAsync) {
 		if (redrawing) return
 		redrawing = true
 		if (force) forcing = true
@@ -1405,7 +1393,12 @@
 			// before the next animation frame
 			// lastRedrawID is null if it's the first redraw and not an event
 			// handler
-			if (lastRedrawId && !force) {
+      if (forceAsync) {
+          if (!lastRedrawId) {
+            lastRedrawId = $requestAnimationFrame(redraw, FRAME_BUDGET);
+          }
+      }
+			else if (lastRedrawId && !force) {
 				// when setTimeout: only reschedule redraw if time between now
 				// and previous redraw is bigger than a frame, otherwise keep
 				// currently scheduled timeout
