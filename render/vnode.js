@@ -11,7 +11,7 @@ Vnode.normalize = function(node) {
 }
 Vnode.normalizeChildren = function(input) {
 	var children = []
-	if (input.length) {
+	if (window.lichess.mode !== 'release' && input.length) {
 		var isKeyed = input[0] != null && input[0].key != null
 		// Note: this is a *very* perf-sensitive check.
 		// Fun fact: merging the loop like this is somehow faster than splitting
@@ -25,10 +25,10 @@ Vnode.normalizeChildren = function(input) {
 				)
 			}
 		}
-		for (var i = 0; i < input.length; i++) {
-			children[i] = Vnode.normalize(input[i])
-		}
 	}
+  for (var i = 0; i < input.length; i++) {
+    children[i] = Vnode.normalize(input[i])
+  }
 	return children
 }
 
